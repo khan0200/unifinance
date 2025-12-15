@@ -78,6 +78,7 @@ const navLinks = {
 };
 
 const transactionModal = new bootstrap.Modal(document.getElementById('transactionModal'));
+const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
 const transactionForm = document.getElementById('transactionForm');
 
 // Initialization
@@ -114,7 +115,47 @@ window.route = (viewName) => {
     if (navLinks[viewName]) navLinks[viewName].classList.add('active-nav-link');
 };
 
-window.closeOffcanvas = () => {};
+window.closeOffcanvas = () => {
+    const offcanvasElement = document.getElementById('offcanvasSidebar');
+    if (offcanvasElement) {
+        const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
+        if (offcanvasInstance) {
+            offcanvasInstance.hide();
+        }
+    }
+};
+
+window.openDetailsModal = (id) => {
+    const t = transactions.find(tr => tr.id === id);
+    if (!t) return;
+
+    const isIncome = t.type === 'income';
+    const amountColor = isIncome ? 'text-success' : 'text-danger';
+    const iconRx = isIncome ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger';
+    const iconClass = isIncome ? 'bi-arrow-down-left' : 'bi-arrow-up-right';
+
+    // Set Data
+    document.getElementById('detailType').textContent = isIncome ? 'Income' : 'Outcome';
+    document.getElementById('detailAmount').className = `fw-bold mb-0 ${amountColor}`;
+    document.getElementById('detailAmount').textContent = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(t.amount);
+    document.getElementById('detailCurrency').textContent = t.currency || 'USD';
+
+    // Icon
+    const iconContainer = document.getElementById('detailIcon');
+    iconContainer.className = `rounded-circle d-inline-flex align-items-center justify-content-center mb-3 ${iconRx}`;
+    iconContainer.querySelector('i').className = `bi ${iconClass} fs-2`;
+
+    // Details
+    document.getElementById('detailDescription').textContent = t.description;
+    document.getElementById('detailDate').textContent = t.date;
+    document.getElementById('detailMethod').textContent = t.paymentMethod || 'General';
+
+    detailsModal.show();
+};
+
 
 // Modal Logic
 window.openAddModal = (type) => {
@@ -305,9 +346,84 @@ function updateDashboard() {
     document.getElementById('summary-month-income').textContent = fmtDash(monthIncome);
     document.getElementById('summary-month-outcome').textContent = fmtDash(monthOutcome);
 
-    // Update Global Balance
-    document.getElementById('balance-usd').textContent = fmtCurr(balanceUSD, 'USD');
-    document.getElementById('balance-uzs').textContent = fmtCurr(balanceUZS, 'UZS');
+    // Update Balances by Payment Method
+    updateBalancesByPaymentMethod();
+}
+
+function updateBalancesByPaymentMethod() {
+    // Payment methods map for display
+    const paymentMethodsDisplay = {
+        'Cash': 'NAQD',
+        'Karta M.A': 'Karta M.A',
+        'Karta J.A': 'Karta J.A',
+        'Bank': 'Bank',
+        'Other': 'Other'
+    };
+
+    // Calculate balances by payment method for each currency
+    const balancesByMethod = {};
+
+    transactions.forEach(t => {
+        const method = t.paymentMethod || 'Cash';
+        const curr = t.currency || 'USD';
+        const val = parseFloat(t.amount);
+
+        if (!balancesByMethod[method]) {
+            balancesByMethod[method] = {
+                USD: 0,
+                UZS: 0
+            };
+        }
+
+        if (t.type === 'income') {
+            balancesByMethod[method][curr] += val;
+        } else {
+            balancesByMethod[method][curr] -= val;
+        }
+    });
+
+    // Format currencies
+    const fmt = (amt, curr) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: curr,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amt);
+
+    // Build HTML for balance display
+    const container = document.getElementById('balance-by-method-container');
+    const balanceElements = [];
+
+    // Iterate through payment methods in order
+    const methodsOrder = ['Cash', 'Karta M.A', 'Karta J.A', 'Bank', 'Other'];
+
+    methodsOrder.forEach(method => {
+        if (balancesByMethod[method]) {
+            const balUSD = balancesByMethod[method].USD;
+            const balUZS = balancesByMethod[method].UZS;
+
+            // Display method if it has any balance
+            if (balUSD !== 0 || balUZS !== 0) {
+                const displayName = paymentMethodsDisplay[method];
+                let balanceText = '';
+
+                if (balUSD !== 0) balanceText += `${fmt(balUSD, 'USD')}`;
+                if (balUZS !== 0) {
+                    if (balanceText) balanceText += ' | ';
+                    balanceText += `${fmt(balUZS, 'UZS')}`;
+                }
+
+                balanceElements.push(`<div class="badge bg-primary text-white px-3 py-2 fw-bold"><strong>${displayName}:</strong> ${balanceText}</div>`);
+            }
+        }
+    });
+
+    // If no balances, show zero message
+    if (balanceElements.length === 0) {
+        container.innerHTML = '<div class="text-muted small">No transactions yet</div>';
+    } else {
+        container.innerHTML = balanceElements.join('');
+    }
 }
 
 function updateViewStats() {
@@ -604,55 +720,57 @@ function createTransactionItem(t) {
     const isSelected = selectedIds.has(t.id);
 
     return `
-        <div class="transaction-item d-flex align-items-center justify-content-between p-3 mb-2 shadow-sm">
+        <div class="transaction-item d-flex align-items-center justify-content-between p-2 p-md-3 shadow-sm">
             <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
-                <!-- Checkbox -->
-                <div class="me-3">
-                    <input class="form-check-input" type="checkbox" style="width: 18px; height: 18px; cursor: pointer;" 
+                <!-- Checkbox (Stop propagation to prevent opening modal) -->
+                <div class="me-2 me-md-3" onclick="event.stopPropagation()">
+                    <input class="form-check-input" type="checkbox" style="width: 16px; height: 16px; cursor: pointer;" 
                         ${isSelected ? 'checked' : ''} onchange="toggleSelection('${t.id}')">
                 </div>
 
-                <!-- Date -->
-                <div class="d-flex flex-column align-items-center justify-content-center me-3 border border-light rounded-3 bg-white" style="width: 48px; height: 48px; min-width: 48px;">
-                    <span class="fw-bold fs-6 text-dark lh-1">${day}</span>
-                    <span class="text-uppercase-xs text-muted lh-1 mt-1">${month}</span>
-                </div>
-                
-                <!-- Icon -->
-                <div class="me-3 d-none d-sm-flex">
-                     <div class="rounded-circle d-flex align-items-center justify-content-center ${iconColor}" style="width: 40px; height: 40px;">
-                        <i class="bi ${arrowIcon} fs-5"></i>
-                     </div>
-                </div>
+                <!-- Clickable Area for Details -->
+                <div class="d-flex align-items-center flex-grow-1 cursor-pointer" onclick="openDetailsModal('${t.id}')">
+                    <!-- Date -->
+                    <div class="d-flex flex-column align-items-center justify-content-center me-2 me-md-3 border border-light rounded-3 bg-white" style="width: 40px; height: 40px; min-width: 40px;">
+                        <span class="fw-bold text-dark lh-1" style="font-size: 0.9rem;">${day}</span>
+                        <span class="text-uppercase-xs text-muted lh-1 mt-1" style="font-size: 0.65rem;">${month}</span>
+                    </div>
+                    
+                    <!-- Icon (Hidden on mobile) -->
+                    <div class="me-3 d-none d-sm-flex">
+                         <div class="rounded-circle d-flex align-items-center justify-content-center ${iconColor}" style="width: 40px; height: 40px;">
+                            <i class="bi ${arrowIcon} fs-5"></i>
+                         </div>
+                    </div>
 
-                <!-- Details -->
-                <div class="d-flex flex-column justify-content-center overflow-hidden me-3">
-                    <h6 class="mb-0 fw-bold text-dark text-truncate">${t.description}</h6>
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="badge bg-white border border-light text-muted fw-normal rounded-pill px-2 py-1" style="font-size: 0.7rem;">
-                            ${t.paymentMethod || 'General'}
+                    <!-- Details -->
+                    <div class="d-flex flex-column justify-content-center overflow-hidden me-2">
+                        <div class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">${t.description}</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="badge bg-white border border-light text-muted fw-normal rounded-pill px-2 py-0" style="font-size: 0.65rem;">
+                                ${t.paymentMethod || 'General'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Amount is also part of the clickable area for better UX -->
+                    <div class="text-end ms-auto me-3">
+                        <span class="${amountColor} fw-black d-block text-nowrap" style="font-size: 1rem;">
+                            ${isIncome ? '+' : '-'}${new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(t.amount)}
                         </span>
+                        <small class="text-uppercase-xs text-muted" style="font-size: 0.65rem;">${t.currency || 'USD'}</small>
                     </div>
                 </div>
             </div>
             
-            <!-- Amount & Actions -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <div class="text-end">
-                    <span class="${amountColor} fw-black fs-5 d-block text-nowrap">
-                        ${isIncome ? '+' : '-'}${new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(t.amount)}
-                    </span>
-                    <small class="text-uppercase-xs text-muted">${t.currency || 'USD'}</small>
-                </div>
-                
-                <div class="d-flex gap-1 action-buttons">
-                    <button class="btn btn-sm btn-light border-0 text-muted hover-primary p-2 rounded-circle" onclick="editTransaction('${t.id}')" title="Edit">
-                        <i class="bi bi-pencil-fill" style="font-size: 0.9rem;"></i>
-                    </button>
-                    <button class="btn btn-sm btn-light border-0 text-muted hover-danger p-2 rounded-circle" onclick="deleteTransaction('${t.id}')" title="Delete">
-                        <i class="bi bi-trash-fill" style="font-size: 0.9rem;"></i>
-                    </button>
-                </div>
+            <!-- Actions (Stop propagation) -->
+            <div class="d-flex align-items-center gap-1 action-buttons" onclick="event.stopPropagation()">
+                <button class="btn btn-sm btn-light border-0 text-muted hover-primary p-1 rounded-circle" onclick="editTransaction('${t.id}')" title="Edit" style="width: 28px; height: 28px;">
+                    <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                </button>
+                <button class="btn btn-sm btn-light border-0 text-muted hover-danger p-1 rounded-circle" onclick="deleteTransaction('${t.id}')" title="Delete" style="width: 28px; height: 28px;">
+                    <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i>
+                </button>
             </div>
         </div>
     `;
