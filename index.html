@@ -40,27 +40,47 @@
         </div>
 
         <!-- Mobile Offcanvas Sidebar -->
-        <div class="offcanvas offcanvas-start glass-sidebar w-75 border-0" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
-            <div class="offcanvas-header p-4">
-                <h5 class="offcanvas-title sidebar-heading mb-0 d-flex align-items-center gap-2" id="offcanvasSidebarLabel">
-                    <img src="Logo.png" alt="Logo" style="height: 32px; width: auto;">
-                    UniFinance
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <div class="offcanvas offcanvas-start mobile-sidebar mobile-sidebar-narrow" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+            <div class="offcanvas-header mobile-offcanvas-header">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="Logo.png" alt="Logo" style="height: 40px; width: auto;">
+                    <h5 class="offcanvas-title sidebar-heading mb-0" id="offcanvasSidebarLabel">UniFinance</h5>
+                </div>
+                <button type="button" class="btn-close mobile-close-btn" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body p-4 d-flex flex-column">
-                <div class="d-flex flex-column gap-2">
-                    <a href="#" class="nav-link-custom" onclick="route('dashboard'); closeOffcanvas()">
-                        <i class="bi bi-grid-fill"></i> Dashboard
+            <div class="offcanvas-body mobile-offcanvas-body">
+                <div class="mobile-nav-items">
+                    <a href="#" class="mobile-nav-item" onclick="route('dashboard'); closeOffcanvas()">
+                        <div class="mobile-nav-icon">
+                            <i class="bi bi-grid-fill"></i>
+                        </div>
+                        <div class="mobile-nav-label">
+                            <span class="mobile-nav-text">Dashboard</span>
+                        </div>
                     </a>
-                    <a href="#" class="nav-link-custom" onclick="route('income'); closeOffcanvas()">
-                        <i class="bi bi-arrow-down-left-circle-fill"></i> Income
+                    <a href="#" class="mobile-nav-item" onclick="route('income'); closeOffcanvas()">
+                        <div class="mobile-nav-icon success-icon">
+                            <i class="bi bi-arrow-down-left-circle-fill"></i>
+                        </div>
+                        <div class="mobile-nav-label">
+                            <span class="mobile-nav-text">Income</span>
+                        </div>
                     </a>
-                    <a href="#" class="nav-link-custom" onclick="route('outcome'); closeOffcanvas()">
-                        <i class="bi bi-arrow-up-right-circle-fill"></i> Outcome
+                    <a href="#" class="mobile-nav-item" onclick="route('outcome'); closeOffcanvas()">
+                        <div class="mobile-nav-icon danger-icon">
+                            <i class="bi bi-arrow-up-right-circle-fill"></i>
+                        </div>
+                        <div class="mobile-nav-label">
+                            <span class="mobile-nav-text">Outcome</span>
+                        </div>
                     </a>
-                    <a href="#" class="nav-link-custom" onclick="route('archive'); closeOffcanvas()">
-                        <i class="bi bi-archive-fill"></i> Archive
+                    <a href="#" class="mobile-nav-item" onclick="route('archive'); closeOffcanvas()">
+                        <div class="mobile-nav-icon warning-icon">
+                            <i class="bi bi-archive-fill"></i>
+                        </div>
+                        <div class="mobile-nav-label">
+                            <span class="mobile-nav-text">Archive</span>
+                        </div>
                     </a>
                 </div>
             </div>
@@ -69,10 +89,31 @@
         <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100 position-relative">
             <!-- Navbar (Mobile Toggle) -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-transparent px-4 pt-4 pb-2 d-lg-none">
-                <button class="btn btn-light rounded-circle shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar">
+            <nav class="mobile-header d-lg-none">
+                <button class="btn btn-primary rounded-2 mobile-menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Toggle navigation">
                     <i class="bi bi-list fs-5"></i>
                 </button>
+                
+                <!-- Mobile Quick Add Button with Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-primary rounded-circle mobile-quick-btn-add" type="button" id="mobileAddDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Add Transaction">
+                        <i class="bi bi-plus-lg fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end mobile-add-menu" aria-labelledby="mobileAddDropdown">
+                        <li>
+                            <a class="dropdown-item mobile-add-item mobile-add-income" href="#" onclick="openAddModal('income')">
+                                <i class="bi bi-arrow-down-left-circle-fill"></i>
+                                <span>Add Income</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item mobile-add-item mobile-add-outcome" href="#" onclick="openAddModal('outcome')">
+                                <i class="bi bi-arrow-up-right-circle-fill"></i>
+                                <span>Add Outcome</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
 
             <div class="container-fluid p-5">
@@ -81,16 +122,19 @@
                 <div id="view-dashboard" class="view-section">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 gap-3">
                         <div>
-                            <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
                                 <h2 class="fw-black m-0 display-6">Overview</h2>
-                                <div class="vr mx-2 text-secondary opacity-25 d-none d-sm-block"></div>
-                                <div class="badge bg-white text-secondary border shadow-sm fw-normal py-2 px-3 rounded-pill">
-                                    <span class="fw-bold text-dark">Balance:</span> 
-                                    <span class="fw-bold text-primary" id="balance-usd">$0</span> 
-                                    <span class="text-muted mx-1">|</span> 
-                                    <span class="fw-bold text-primary" id="balance-uzs">0 UZS</span>
+                            </div>
+                            
+                            <!-- Balances by Payment Method -->
+                            <div class="mb-3">
+                                <div class="text-uppercase-xs text-secondary fw-bold mb-2">Balance by Payment Method</div>
+                                <div id="balance-by-method-container" class="d-flex flex-wrap gap-2">
+                                    <!-- Dynamically populated by JavaScript -->
+                                    <div class="small text-muted">Loading...</div>
                                 </div>
                             </div>
+                            
                             <span class="text-secondary fw-medium" id="current-date">Fetching date...</span>
                         </div>
                         
@@ -103,8 +147,8 @@
 
                     <!-- Summary Cards -->
                     <div class="row g-4 mb-5" id="dashboard-cards-container">
-                        <div class="col-xl-3 col-md-6">
-                            <div class="glass-card p-4 h-100">
+                        <div class="col-6 col-xl-3">
+                            <div class="glass-card p-3 h-100">
                                 <div class="stat-icon-wrapper bg-success-soft mb-3">
                                     <i class="bi bi-arrow-down-left"></i>
                                 </div>
@@ -112,8 +156,8 @@
                                 <h3 class="mb-0 fw-bold" id="summary-today-income">$0.00</h3>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="glass-card p-4 h-100">
+                        <div class="col-6 col-xl-3">
+                            <div class="glass-card p-3 h-100">
                                 <div class="stat-icon-wrapper bg-danger-soft mb-3">
                                     <i class="bi bi-arrow-up-right"></i>
                                 </div>
@@ -121,8 +165,8 @@
                                 <h3 class="mb-0 fw-bold" id="summary-today-outcome">$0.00</h3>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="glass-card p-4 h-100">
+                        <div class="col-6 col-xl-3">
+                            <div class="glass-card p-3 h-100">
                                 <div class="stat-icon-wrapper bg-primary-soft mb-3">
                                     <i class="bi bi-calendar-check"></i>
                                 </div>
@@ -130,8 +174,8 @@
                                 <h3 class="mb-0 fw-bold" id="summary-month-income">$0.00</h3>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="glass-card p-4 h-100">
+                        <div class="col-6 col-xl-3">
+                            <div class="glass-card p-3 h-100">
                                 <div class="stat-icon-wrapper bg-warning-soft mb-3">
                                     <i class="bi bi-wallet2"></i>
                                 </div>
@@ -167,13 +211,14 @@
 
                 <!-- Income View -->
                 <div id="view-income" class="view-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                          <h2 class="fw-black text-main m-0">Income</h2>
-                         <button class="btn btn-success btn-sm shadow-sm" onclick="openAddModal('income')"><i class="bi bi-plus-lg"></i> Add New</button>
+                         <button class="btn btn-success btn-sm shadow-sm add-new-btn-responsive" onclick="openAddModal('income')"><i class="bi bi-plus-lg"></i> <span>Add New</span></button>
                     </div>
                     
                     <!-- Income Stats -->
-                    <div class="row g-3 mb-5">
+                    <!-- Income Stats -->
+                    <div class="row g-3 mb-3">
                         <div class="col-6 col-xl-3">
                             <div class="glass-card p-3 h-100 border-start border-4 border-success">
                                 <h6 class="text-uppercase-xs text-secondary mb-1">Today (USD)</h6>
@@ -201,26 +246,28 @@
                     </div>
                     
                     <!-- Controls -->
-                    <div class="glass-panel p-3 mb-4 rounded-3 overflow-x-auto">
-                        <div class="d-flex flex-nowrap align-items-center gap-3" style="min-width: max-content;">
+                    <div class="glass-panel p-3 mb-3 rounded-3 overflow-x-auto">
+                        <div class="controls-wrapper">
                             
                             <!-- Search -->
-                            <div class="glass-input-group" style="width: 300px;">
-                                <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
-                                <input type="text" class="glass-input ps-2" id="income-search" placeholder="Search transactions..." oninput="renderLists()">
+                            <div class="search-wrapper">
+                                <div class="glass-input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="glass-input ps-2" id="income-search" placeholder="Search transactions..." oninput="renderLists()">
+                                </div>
                             </div>
 
-                            <div class="vr opacity-25 my-1"></div>
+                            <div class="vr opacity-25 my-1 controls-vr"></div>
 
                             <!-- Date Range -->
-                            <div class="d-flex align-items-center gap-2 bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="income-filter-start" onchange="renderLists()" style="width: 130px; cursor: pointer;">
+                            <div class="date-filter-wrapper bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="income-filter-start" onchange="renderLists()" style="cursor: pointer;">
                                 <span class="text-muted fw-bold small text-uppercase" style="font-size: 0.7rem;">To</span>
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="income-filter-end" onchange="renderLists()" style="width: 130px; cursor: pointer;">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="income-filter-end" onchange="renderLists()" style="cursor: pointer;">
                             </div>
 
                             <!-- Method -->
-                            <select class="form-select w-auto shadow-sm" id="income-filter-method" onchange="renderLists()" style="min-width: 150px; cursor: pointer;">
+                            <select class="form-select shadow-sm filter-select" id="income-filter-method" onchange="renderLists()" style="cursor: pointer;">
                                 <option value="All">All Methods</option>
                                 <option value="Cash">Cash (Naqd)</option>
                                 <option value="Karta M.A">Karta M.A</option>
@@ -234,12 +281,14 @@
                                 <i class="bi bi-x"></i> Clear
                             </button>
 
-                            <div class="vr opacity-25 my-1 ms-auto"></div>
+                            <div class="vr opacity-25 my-1 ms-auto controls-vr"></div>
 
                             <!-- Currency Toggle -->
-                            <div class="bg-gray-100 p-1 rounded-pill d-flex border border-secondary border-opacity-10">
-                                <button class="btn btn-sm rounded-pill fw-bold btn-white shadow-sm px-3 position-relative" id="income-btn-usd" onclick="switchListCurrency('income', 'USD')">USD <span class="badge bg-dark rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="income-usd-count">0</span></button>
-                                <button class="btn btn-sm rounded-pill fw-bold text-muted px-3 position-relative" id="income-btn-uzs" onclick="switchListCurrency('income', 'UZS')">UZS <span class="badge bg-secondary rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="income-uzs-count">0</span></button>
+                            <div class="currency-toggle-wrapper">
+                                <div class="bg-gray-100 p-1 rounded-pill d-flex border border-secondary border-opacity-10">
+                                    <button class="btn btn-sm rounded-pill fw-bold btn-white shadow-sm px-3 position-relative" id="income-btn-usd" onclick="switchListCurrency('income', 'USD')">USD <span class="badge bg-dark rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="income-usd-count">0</span></button>
+                                    <button class="btn btn-sm rounded-pill fw-bold text-muted px-3 position-relative" id="income-btn-uzs" onclick="switchListCurrency('income', 'UZS')">UZS <span class="badge bg-secondary rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="income-uzs-count">0</span></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -248,20 +297,20 @@
                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill" id="income-selection-text"></span>
                     </div>
 
-                    <div id="income-list" class="d-flex flex-column gap-3">
+                    <div id="income-list" class="d-flex flex-column gap-2">
                         <!-- Items will be injected here -->
                     </div>
                 </div>
 
                 <!-- Outcome View -->
                 <div id="view-outcome" class="view-section d-none">
-                    <div class="d-flex justify-content-between align-items-center mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="fw-black text-main m-0">Outcome</h2>
-                        <button class="btn btn-danger btn-sm shadow-sm" onclick="openAddModal('outcome')"><i class="bi bi-plus-lg"></i> Add New</button>
+                        <button class="btn btn-danger btn-sm shadow-sm add-new-btn-responsive" onclick="openAddModal('outcome')"><i class="bi bi-plus-lg"></i> <span>Add New</span></button>
                    </div>
 
                     <!-- Outcome Stats -->
-                    <div class="row g-3 mb-5">
+                    <div class="row g-3 mb-3">
                         <div class="col-6 col-xl-3">
                             <div class="glass-card p-3 h-100 border-start border-4 border-danger">
                                 <h6 class="text-uppercase-xs text-secondary mb-1">Today (USD)</h6>
@@ -289,26 +338,28 @@
                     </div>
 
                     <!-- Controls -->
-                    <div class="glass-panel p-3 mb-4 rounded-3 overflow-x-auto">
-                        <div class="d-flex flex-nowrap align-items-center gap-3" style="min-width: max-content;">
+                    <div class="glass-panel p-3 mb-3 rounded-3 overflow-x-auto">
+                        <div class="controls-wrapper">
                             
                             <!-- Search -->
-                            <div class="glass-input-group" style="width: 300px;">
-                                <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
-                                <input type="text" class="glass-input ps-2" id="outcome-search" placeholder="Search transactions..." oninput="renderLists()">
+                            <div class="search-wrapper">
+                                <div class="glass-input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="glass-input ps-2" id="outcome-search" placeholder="Search transactions..." oninput="renderLists()">
+                                </div>
                             </div>
 
-                            <div class="vr opacity-25 my-1"></div>
+                            <div class="vr opacity-25 my-1 controls-vr"></div>
 
                             <!-- Date Range -->
-                            <div class="d-flex align-items-center gap-2 bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="outcome-filter-start" onchange="renderLists()" style="width: 130px; cursor: pointer;">
+                            <div class="date-filter-wrapper bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="outcome-filter-start" onchange="renderLists()" style="cursor: pointer;">
                                 <span class="text-muted fw-bold small text-uppercase" style="font-size: 0.7rem;">To</span>
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="outcome-filter-end" onchange="renderLists()" style="width: 130px; cursor: pointer;">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="outcome-filter-end" onchange="renderLists()" style="cursor: pointer;">
                             </div>
 
                             <!-- Method -->
-                            <select class="form-select w-auto shadow-sm" id="outcome-filter-method" onchange="renderLists()" style="min-width: 150px; cursor: pointer;">
+                            <select class="form-select shadow-sm filter-select" id="outcome-filter-method" onchange="renderLists()" style="cursor: pointer;">
                                 <option value="All">All Methods</option>
                                 <option value="Cash">Cash (Naqd)</option>
                                 <option value="Karta M.A">Karta M.A</option>
@@ -322,12 +373,14 @@
                                 <i class="bi bi-x"></i> Clear
                             </button>
 
-                            <div class="vr opacity-25 my-1 ms-auto"></div>
+                            <div class="vr opacity-25 my-1 ms-auto controls-vr"></div>
 
                             <!-- Currency Toggle -->
-                            <div class="bg-gray-100 p-1 rounded-pill d-flex border border-secondary border-opacity-10">
-                                <button class="btn btn-sm rounded-pill fw-bold btn-white shadow-sm px-3 position-relative" id="outcome-btn-usd" onclick="switchListCurrency('outcome', 'USD')">USD <span class="badge bg-dark rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="outcome-usd-count">0</span></button>
-                                <button class="btn btn-sm rounded-pill fw-bold text-muted px-3 position-relative" id="outcome-btn-uzs" onclick="switchListCurrency('outcome', 'UZS')">UZS <span class="badge bg-secondary rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="outcome-uzs-count">0</span></button>
+                            <div class="currency-toggle-wrapper">
+                                <div class="bg-gray-100 p-1 rounded-pill d-flex border border-secondary border-opacity-10">
+                                    <button class="btn btn-sm rounded-pill fw-bold btn-white shadow-sm px-3 position-relative" id="outcome-btn-usd" onclick="switchListCurrency('outcome', 'USD')">USD <span class="badge bg-dark rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="outcome-usd-count">0</span></button>
+                                    <button class="btn btn-sm rounded-pill fw-bold text-muted px-3 position-relative" id="outcome-btn-uzs" onclick="switchListCurrency('outcome', 'UZS')">UZS <span class="badge bg-secondary rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem;" id="outcome-uzs-count">0</span></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -336,7 +389,7 @@
                          <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill" id="outcome-selection-text"></span>
                     </div>
 
-                    <div id="outcome-list" class="d-flex flex-column gap-3">
+                    <div id="outcome-list" class="d-flex flex-column gap-2">
                         <!-- Items will be injected here -->
                     </div>
                 </div>
@@ -364,22 +417,24 @@
 
                     <!-- Controls -->
                     <div class="glass-panel p-3 mb-4 rounded-3 overflow-x-auto">
-                        <div class="d-flex flex-nowrap align-items-center gap-3" style="min-width: max-content;">
+                        <div class="controls-wrapper">
                             
                             <!-- Search -->
-                            <div class="glass-input-group" style="width: 300px;">
-                                <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
-                                <input type="text" class="glass-input ps-2" id="archive-search" placeholder="Search archives..." oninput="filterArchiveEntries()">
+                            <div class="search-wrapper">
+                                <div class="glass-input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-secondary ps-3"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="glass-input ps-2" id="archive-search" placeholder="Search archives..." oninput="filterArchiveEntries()">
+                                </div>
                             </div>
 
-                            <!-- Additional filters can remain as they were but styled -->
-                            <select class="form-select w-auto shadow-sm" id="archive-filter-type" onchange="filterArchiveEntries()" style="min-width: 150px; cursor: pointer;">
+                            <!-- Additional filters -->
+                            <select class="form-select shadow-sm filter-select" id="archive-filter-type" onchange="filterArchiveEntries()" style="cursor: pointer;">
                                 <option value="All">All Types</option>
                                 <option value="income">Income Only</option>
                                 <option value="outcome">Outcome Only</option>
                             </select>
 
-                            <select class="form-select w-auto shadow-sm" id="archive-filter-method" onchange="filterArchiveEntries()" style="min-width: 150px; cursor: pointer;">
+                            <select class="form-select shadow-sm filter-select" id="archive-filter-method" onchange="filterArchiveEntries()" style="cursor: pointer;">
                                 <option value="All">All Methods</option>
                                 <option value="Cash">Cash (Naqd)</option>
                                 <option value="Karta M.A">Karta M.A</option>
@@ -388,10 +443,10 @@
                                 <option value="Other">Other</option>
                             </select>
 
-                            <div class="d-flex align-items-center gap-2 bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="archive-filter-start" onchange="filterArchiveEntries()" style="width: 130px;">
+                            <div class="date-filter-wrapper bg-white rounded-3 p-1 shadow-sm border border-secondary border-opacity-10">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="archive-filter-start" onchange="filterArchiveEntries()">
                                 <span class="text-muted fw-bold small">TO</span>
-                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="archive-filter-end" onchange="filterArchiveEntries()" style="width: 130px;">
+                                <input type="date" class="form-control border-0 bg-transparent py-1 fs-6 text-secondary" id="archive-filter-end" onchange="filterArchiveEntries()">
                             </div>
                              
                             <button class="btn btn-sm btn-light border shadow-sm d-none" id="archive-clear-filters" onclick="clearArchiveFilters()">
@@ -405,11 +460,49 @@
                     </div>
 
                     <!-- Archive List -->
-                    <div id="archive-list" class="d-flex flex-column gap-3">
+                    <div id="archive-list" class="d-flex flex-column gap-2">
                         <!-- Items will be injected here -->
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Details Modal -->
+    <div class="modal fade glass-modal" id="detailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pt-0 pb-4">
+                    <div class="mb-3">
+                        <div id="detailIcon" class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi fs-2"></i>
+                        </div>
+                        <h6 class="text-uppercase-xs text-secondary mb-1" id="detailType">Type</h6>
+                        <h2 class="fw-bold mb-0" id="detailAmount">0.00</h2>
+                        <span class="badge rounded-pill bg-light text-dark border mt-2" id="detailCurrency">USD</span>
+                    </div>
+                    
+                    <div class="card border-0 bg-light bg-opacity-50 p-3 text-start mb-3 rounded-4">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="text-uppercase-xs text-muted d-block">Description</label>
+                                <span class="fw-bold text-dark fs-6" id="detailDescription">-</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label class="text-uppercase-xs text-muted d-block">Date</label>
+                                <span class="fw-bold text-dark" id="detailDate">-</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label class="text-uppercase-xs text-muted d-block">Method</label>
+                                <span class="fw-bold text-dark" id="detailMethod">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
